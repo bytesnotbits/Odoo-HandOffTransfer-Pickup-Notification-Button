@@ -1,0 +1,71 @@
+Step 1 — Create tracking fields on Transfers (stock.picking)
+
+We’ll add four fields that power the button logic and audit trail.
+
+1A) Open Studio on the Transfer form
+
+Go to Inventory → Operations → Transfers.
+
+Open any Handoff transfer (or any transfer—just for editing the view).
+
+Click ⋮ (gear) → Studio to open Studio on the transfer form.
+
+1B) Add fields (all on model: Transfer (stock.picking))
+
+Create these four fields:
+
+Pickup Notified
+
+Type: Boolean
+
+Technical name: x_ready_notified
+
+Label: Pickup Notified
+
+Properties: set Read-only (we’ll update it via server action)
+
+Placement: put this in a small “Notifications” section on the form (not the header).
+
+Pickup Notified On
+
+Type: Datetime
+
+Technical name: x_ready_notified_on
+
+Label: Pickup Notified On
+
+Properties: Read-only
+
+Placement: same “Notifications” section.
+
+Pickup Notified By
+
+Type: Many2one → Users (res.users)
+
+Technical name: x_ready_notified_by
+
+Label: Pickup Notified By
+
+Properties: Read-only
+
+Placement: same “Notifications” section.
+
+Notify Count
+
+Type: Integer
+
+Technical name: x_notify_count
+
+Label: Notify Count
+
+Widget: Badge (in field options → Widget → choose Badge)
+
+Properties: Read-only
+
+Placement: drag this field into the header (top bar of the form) to the right side so users see it like a counter next to the future button.
+
+Tip: If “Badge” isn’t available in your Studio widget list, leave it as an Integer for now—we’ll still increment it; we can change the widget later.
+
+1C) Save the view
+
+Click Close (top-right of Studio) to save.
