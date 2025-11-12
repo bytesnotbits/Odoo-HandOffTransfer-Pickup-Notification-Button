@@ -36,17 +36,17 @@ def extract_emails(raw):
             out.append(e)
     return out
 
-# --- Collect extra emails from Customer + Delivery Address (Studio field x_notify_pickup_ready) ---
+# --- Collect extra emails from Customer + Delivery Address (Studio field x_studio_notify_pickup_ready) ---
 extra_sources = []
 
-if so and so.partner_id and 'x_notify_pickup_ready' in so.partner_id._fields:
-    extra_sources.append(so.partner_id.x_notify_pickup_ready or '')
+if so and so.partner_id and 'x_studio_notify_pickup_ready' in so.partner_id._fields:
+    extra_sources.append(so.partner_id.x_studio_notify_pickup_ready or '')
 
 shipping = False
 if so and 'partner_shipping_id' in so._fields:
     shipping = so.partner_shipping_id or False
-if shipping and 'x_notify_pickup_ready' in shipping._fields:
-    extra_sources.append(shipping.x_notify_pickup_ready or '')
+if shipping and 'x_studio_notify_pickup_ready' in shipping._fields:
+    extra_sources.append(shipping.x_studio_notify_pickup_ready or '')
 
 for src in extra_sources:
     for e in extract_emails(src):
@@ -88,12 +88,12 @@ mail = Mail.create(mail_values)
 mail.send()
 
 # --- Audit: increment counter and stamp who/when ---
-count = (record.x_notify_count or 0) + 1
+count = (record.x_studio_notify_count or 0) + 1
 record.write({
-    'x_ready_notified': True,
-    'x_ready_notified_on': fields.Datetime.now(),
-    'x_ready_notified_by': env.user.id,
-    'x_notify_count': count,
+    'x_studio_ready_notified': True,
+    'x_studio_pickup_notified_on': fields.Datetime.now(),
+    'x_studio_pickup_notified_by': env.user.id,
+    'x_studio_notify_count': count,
 })
 
 # --- Chatter note with recipients ---
