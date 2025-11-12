@@ -1,1 +1,0 @@
-This step was intended to create an email template, but this template will be implemented into the server action. The current "Ready for Pickup" email template sent when the HandOff transfer is validated will be changed to reflect that the order has been picked up.
