@@ -88,13 +88,20 @@ mail = Mail.create(mail_values)
 mail.send()
 
 # --- Audit: increment counter and stamp who/when ---
-count = (record.x_studio_notify_count or 0) + 1
-record.write({
-    'x_studio_ready_notified': True,
-    'x_studio_pickup_notified_on': fields.Datetime.now(),
-    'x_studio_pickup_notified_by': env.user.id,
-    'x_studio_notify_count': count,
-})
+vals = {}
+if 'x_studio_ready_notified' in record._fields:
+    vals['x_studio_ready_notified'] = True
+if 'x_studio_pickup_notified_on' in record._fields:
+    # was: fields.Datetime.now()
+    import_error_guard = True  # no-op; just to keep indentation context clear
+    vals['x_studio_pickup_notified_on'] = datetime.datetime.utcnow()
+if 'x_studio_pickup_notified_by' in record._fields:
+    vals['x_studio_pickup_notified_by'] = env.user.id
+if has_count:
+    vals['x_studio_notify_count'] = new_count
+
+if vals:
+    record.write(vals)
 
 # --- Chatter note with recipients ---
 record.message_post(
