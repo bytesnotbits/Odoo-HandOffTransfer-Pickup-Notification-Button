@@ -74,3 +74,29 @@ This step was intended to create an email template, but this template will be im
 
 ---
 
+# Step 3 — Create the Server Action (Send Email Without a Template)
+
+---
+
+## 3A — Create the Server Action
+
+1. Navigate to **Settings → Technical → Automation → Server Actions → New**  
+2. Fill in the following details:
+
+   - **Name:** `Notify Ready for Pickup (Email)`  
+   - **Model:** `Transfer (stock.picking)`  
+   - **Action To Do:** `Execute Python Code`  
+   - **Python Code File:** `readyForPickupButton.py`
+
+3. **Save** the Server Action.  
+4. Click **Create Contextual Action** to add it as a button on the Transfer form.
+
+---
+
+## 3B — Result
+
+That’s it for the backend logic.  
+No email template is involved — so **nothing else can auto-fire this message** except your **custom “Notify Ready for Pickup” button**.
+
+---
+
