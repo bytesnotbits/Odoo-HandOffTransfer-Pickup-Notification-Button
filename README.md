@@ -100,3 +100,40 @@ No email template is involved — so **nothing else can auto-fire this message**
 
 ---
 
+Step 4 — Add the “Notify Ready for Pickup” button on Handoff transfers
+4A) Open Studio on a Handoff transfer
+
+Go to Inventory → Operations → Transfers.
+
+Open any Handoff transfer.
+
+Click ⋮ (gear) → Studio to edit the form.
+
+4B) Add the button
+
+In the left palette, choose Buttons → drag a Header Button (or regular Form button if header isn’t available) onto the form.
+
+Label: Notify Ready for Pickup
+
+Type / Action: Execute Server Action
+
+Server Action: select Notify Ready for Pickup (Email) (the one you just created).
+
+Confirm before execution: enable and set message:
+Send pickup notification now?
+
+4C) Visibility (only on Handoff, not done/cancel)
+
+In the button’s Visibility / Domain (sometimes labeled “Limit Visibility” or “Invisible If”), set this domain:
+
+```[('picking_type_id', '=', 2), ('state', 'not in', ['done','cancel'])]```
+
+This uses the Operation Type ID = 2, so renaming “Handoff” won’t matter.
+
+Visibility / Domain:
+
+```[('picking_type_id', '=', 2), ('state', 'not in', ['done','cancel']), ('x_notify_count', '>=', 1)]```
+
+4E) Place the counter field near the button (optional)
+
+If you want the team to see the count next to the button, drag x_notify_count near the button area (header or top of the form), and leave it read-only.
