@@ -1,8 +1,12 @@
-# --- Guardrails: only on Handoff (Operation Type ID = 2), not done/cancel ---
+# --- Guardrails: only on Handoff (Operation Type ID = 2), assigned = true, not done/cancel ---
 if not record.picking_type_id or record.picking_type_id.id != 2:
-    raise UserError("This notification is only available on the Handoff operation type (ID 2).")
+
 if record.state in ('done', 'cancel'):
     raise UserError("This transfer is already validated or cancelled.")
+
+# Require 'Ready' (assigned) before notifying
+if record.state != 'assigned':
+    raise UserError("Transfer must be in Ready state (assigned) before notifying.")
 
 so = record.sale_id
 
@@ -12,11 +16,10 @@ for partner in record.message_partner_ids:
     if partner.email:
         emails.add(partner.email.strip().lower())
 
-# --- Helper: parse extra emails without using imports (no regex) ---
+# --- Helper: parse extra emails (no imports) ---
 def extract_emails(raw):
     if not raw:
         return []
-    # Normalize separators to spaces
     txt = raw.replace(',', ' ').replace(';', ' ').replace('\n', ' ').replace('\t', ' ')
     parts = [p.strip() for p in txt.split(' ') if p.strip()]
     out = []
@@ -28,17 +31,19 @@ def extract_emails(raw):
             if end > start:
                 p = p[start:end]
         e = p.strip().lower()
-        # Very light validation: contains one "@", at least one ".", and doesn't end with "."
         if '@' in e and e.count('@') == 1 and '.' in e.split('@')[-1] and not e.endswith('.'):
             out.append(e)
     return out
 
 # --- Collect extra emails from Customer + Delivery Address (your Studio field) ---
 extra_sources = []
-if so and so.partner_id and hasattr(so.partner_id, 'x_notify_pickup_ready'):
-    extra_sources.append(so.partner_id.x_notify_pickup_ready or '')
-if so and getattr(so, 'partner_shipping_id', False) and hasattr(so.partner_shipping_id, 'x_notify_pickup_ready'):
-    extra_sources.append(so.partner_shipping_id.x_notify_pickup_ready or '')
+
+if so and so.partner_id and 'x_notify_pickup_ready' in so.partner_id._fields:
+    extra_sources.append((so.partner_id.x_notify_pickup_ready or ''))
+
+shipping = getattr(so, 'partner_shipping_id', False) if so else False
+if shipping and 'x_notify_pickup_ready' in shipping._fields:
+    extra_sources.append((shipping.x_notify_pickup_ready or ''))
 
 for src in extra_sources:
     for e in extract_emails(src):
@@ -48,27 +53,22 @@ for src in extra_sources:
 if not emails:
     raise UserError("No recipient emails found. Add followers with emails or fill the 'Notify Pickup Ready' field on the Customer/Delivery Address.")
 
-# --- (Optional but recommended) subscribe Customer & Ship-to for audit/portal ---
+# --- (Optional) subscribe Customer & Ship-to for audit/portal ---
 to_follow = []
 if so:
-    for p in (so.partner_id, getattr(so, 'partner_shipping_id', False)):
+    for p in (so.partner_id, shipping):
         if p and p.id not in record.message_partner_ids.ids:
             to_follow.append(p.id)
 if to_follow:
     record.message_subscribe(partner_ids=to_follow)
 
 # --- Compose the email (no template needed) ---
-order_ref = so.name if so else (record.origin or record.name)
+order_ref = (so.name if so else (record.origin or record.name))
 subject = f"Your order {order_ref} is ready for pickup"
 
 body_html = f"""
 <p>Hello,</p>
 <p>Your order <strong>{order_ref}</strong> is ready for pickup.</p>
-
-% if so:
-<p><strong>Order reference:</strong> {order_ref}</p>
-% endif
-
 <p>Thank you,<br/>{record.company_id.name}</p>
 """
 
