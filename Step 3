@@ -7,6 +7,7 @@ Name: Notify Ready for Pickup (Email)
 Model: Transfer (stock.picking)
 
 Action To Do: Execute Python Code
+readyForPickupButton.py
 
 Save the server action.
 
