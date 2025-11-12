@@ -88,12 +88,17 @@ mail = Mail.create(mail_values)
 mail.send()
 
 # --- Audit: increment counter and stamp who/when ---
+has_count = 'x_studio_notify_count' in record._fields
+current = 0
+if has_count:
+    current = record.x_studio_notify_count or 0
+new_count = current + 1
+
 vals = {}
 if 'x_studio_ready_notified' in record._fields:
     vals['x_studio_ready_notified'] = True
 if 'x_studio_pickup_notified_on' in record._fields:
-    # was: fields.Datetime.now()
-    import_error_guard = True  # no-op; just to keep indentation context clear
+    # Safe-eval provides 'datetime' (no need to import)
     vals['x_studio_pickup_notified_on'] = datetime.datetime.utcnow()
 if 'x_studio_pickup_notified_by' in record._fields:
     vals['x_studio_pickup_notified_by'] = env.user.id
@@ -104,8 +109,13 @@ if vals:
     record.write(vals)
 
 # --- Chatter note with recipients ---
+note = "Ready for Pickup notification sent"
+if has_count:
+    note += f" (#{new_count})"
+note += f" to: {', '.join(sorted(emails))}"
+
 record.message_post(
-    body=f"Ready for Pickup notification sent (#{count}) to: {', '.join(sorted(emails))}",
+    body=note,
     message_type='comment',
     subtype_xmlid='mail.mt_note',
 )
