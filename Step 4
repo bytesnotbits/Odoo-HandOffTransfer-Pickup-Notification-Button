@@ -1,37 +1,52 @@
-Step 4 — Add the “Notify Ready for Pickup” button on Handoff transfers
-4A) Open Studio on a Handoff transfer
+# Step 4 — Add the “Notify Ready for Pickup” Button on Handoff Transfers
 
-Go to Inventory → Operations → Transfers.
+---
 
-Open any Handoff transfer.
+## 4A — Open Studio on a Handoff Transfer
 
-Click ⋮ (gear) → Studio to edit the form.
+1. Go to **Inventory → Operations → Transfers**.  
+2. Open any **Handoff transfer**.  
+3. Click the **⋮ (gear)** icon → **Studio** to edit the form.
 
-4B) Add the button
+---
 
-In the left palette, choose Buttons → drag a Header Button (or regular Form button if header isn’t available) onto the form.
+## 4B — Add the Button
 
-Label: Notify Ready for Pickup
+1. In the left palette, choose **Buttons** → drag a **Header Button** (or regular Form button if header isn’t available) onto the form.  
+2. Configure the button:
 
-Type / Action: Execute Server Action
+   - **Label:** `Notify Ready for Pickup`  
+   - **Type / Action:** `Execute Server Action`  
+   - **Server Action:** `Notify Ready for Pickup (Email)` (the one you just created)  
+   - **Confirm Before Execution:** ✅ Enable  
+     - **Confirmation Message:** `Send pickup notification now?`
 
-Server Action: select Notify Ready for Pickup (Email) (the one you just created).
+---
 
-Confirm before execution: enable and set message:
-Send pickup notification now?
+## 4C — Visibility (Only on Handoff, Not Done/Cancel)
 
-4C) Visibility (only on Handoff, not done/cancel)
+In the button’s **Visibility / Domain** (sometimes labeled *“Limit Visibility”* or *“Invisible If”*), set this domain:
 
-In the button’s Visibility / Domain (sometimes labeled “Limit Visibility” or “Invisible If”), set this domain:
+```python
+[('picking_type_id', '=', 2), ('state', 'not in', ['done','cancel'])]
+This uses Operation Type ID = 2, so renaming “Handoff” won’t affect it.
 
-```[('picking_type_id', '=', 2), ('state', 'not in', ['done','cancel'])]```
+Optional — Show Button Only After First Notification Sent
+If you want to show the button only after at least one notification has been sent, use this version instead:
 
-This uses the Operation Type ID = 2, so renaming “Handoff” won’t matter.
+python
+Copy code
+[('picking_type_id', '=', 2), ('state', 'not in', ['done','cancel']), ('x_studio_notify_count', '>=', 1)]
+4E — Place the Counter Field Near the Button (Optional)
+If you want the team to see the count next to the button:
 
-Visibility / Domain:
+Drag the field x_studio_notify_count near the button area (header or top of the form).
 
-```[('picking_type_id', '=', 2), ('state', 'not in', ['done','cancel']), ('x_notify_count', '>=', 1)]```
+Keep it Read-only.
 
-4E) Place the counter field near the button (optional)
+(Optional) Set the Widget to Badge for a clean numeric display.
 
-If you want the team to see the count next to the button, drag x_notify_count near the button area (header or top of the form), and leave it read-only.
+yaml
+Copy code
+
+---
