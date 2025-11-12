@@ -11,4 +11,6 @@ readyForPickupButton.py
 
 Save the server action.
 
+Click 'Create Contextual Action'
+
 That’s it for the backend logic—no template involved, so nothing else can auto-fire this message except your button.
