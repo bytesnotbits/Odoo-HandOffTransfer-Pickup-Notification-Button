@@ -1,79 +1,64 @@
-Step 1 — Create tracking fields on Transfers (stock.picking)
+# Step 1 — Create Tracking Fields on Transfers (`stock.picking`)
 
-We’ll add four fields that power the button logic and audit trail.
-==================================================================
-1A) Open Studio on the Transfer form
+We’ll add **four fields** that power the **Pickup Ready** button logic and audit trail.
 
-Go to Inventory → Operations → Transfers.
+---
 
-Open any Handoff transfer (or any transfer—just for editing the view).
+## 1A — Open Studio on the Transfer Form
 
-Click ⋮ (gear) → Studio to open Studio on the transfer form.
-==================================================================
-1B) Add fields (all on model: Transfer (stock.picking))
+1. Go to **Inventory → Operations → Transfers**.  
+2. Open any **Handoff transfer** (or any transfer—just for editing the view).  
+3. Click the **⋮ (gear)** icon → **Studio** to open Studio on the transfer form.
 
-Create these four fields:
+---
 
-Pickup Notified
+## 1B — Add Fields (Model: Transfer `stock.picking`)
 
-Type: Boolean
+Create the following four fields:
 
-Technical name: x_ready_notified
+### 🟩 Field 1 — Pickup Notified
+- **Type:** Boolean  
+- **Technical Name:** `x_studio_ready_notified`  
+- **Label:** Pickup Notified  
+- **Properties:** Read-only (updated by the server action)  
+- **Placement:** In a small **“Notifications”** section on the form (not the header)
 
-Label: Pickup Notified
+---
 
-Properties: set Read-only (we’ll update it via server action)
+### 🟩 Field 2 — Pickup Notified On
+- **Type:** Datetime  
+- **Technical Name:** `x_studio_pickup_notified_on`  
+- **Label:** Pickup Notified On  
+- **Properties:** Read-only  
+- **Placement:** Same **“Notifications”** section
 
-Placement: put this in a small “Notifications” section on the form (not the header).
+---
 
-Pickup Notified On
+### 🟩 Field 3 — Pickup Notified By
+- **Type:** Many2one → Users (`res.users`)  
+- **Technical Name:** `x_studio_pickup_notified_by`  
+- **Label:** Pickup Notified By  
+- **Properties:** Read-only  
+- **Placement:** Same **“Notifications”** section
 
-Type: Datetime
+---
 
-Technical name: x_ready_notified_on
+### 🟩 Field 4 — Notify Count
+- **Type:** Integer  
+- **Technical Name:** `x_studio_notify_count`  
+- **Label:** Notify Count  
+- **Widget:** **Badge** (if available → *Field Options → Widget → Badge*)  
+- **Properties:** Read-only  
+- **Placement:** Drag this field into the **header (top bar)** of the form, on the right side, so users see it as a counter next to the future button.
 
-Label: Pickup Notified On
+> 💡 **Tip:** If “Badge” isn’t listed in Studio widgets, leave it as an Integer for now. The counter will still increment; you can switch to Badge later.
 
-Properties: Read-only
+---
 
-Placement: same “Notifications” section.
+## B1 — Add the Partner Field (Studio → Contacts)
 
-Pickup Notified By
-
-Type: Many2one → Users (res.users)
-
-Technical name: x_ready_notified_by
-
-Label: Pickup Notified By
-
-Properties: Read-only
-
-Placement: same “Notifications” section.
-
-Notify Count
-
-Type: Integer
-
-Technical name: x_notify_count
-
-Label: Notify Count
-
-Widget: Badge (in field options → Widget → choose Badge)
-
-Properties: Read-only
-
-Placement: drag this field into the header (top bar of the form) to the right side so users see it like a counter next to the future button.
-
-Tip: If “Badge” isn’t available in your Studio widget list, leave it as an Integer for now—we’ll still increment it; we can change the widget later.
-==================================================================
-B1) Add the partner field (Studio → Contacts)
-
-Open Contacts → any partner → Studio.
-
-Add a Text field:
-
-Label: Pickup extra emails
-
-Technical name: x_pickup_extra_emails
-
-Help text: “Comma/semicolon/space separated emails to notify when orders are ready for pickup.”
+1. Open **Contacts → any partner → Studio**.  
+2. Add a **Text** field with the following properties:  
+   - **Label:** Pickup Extra Emails  
+   - **Technical Name:** `x_studio_notify_pickup_ready`  
+   - **Help Text:** “Comma/semicolon/space-separated emails to notify when orders are ready for pickup.”
