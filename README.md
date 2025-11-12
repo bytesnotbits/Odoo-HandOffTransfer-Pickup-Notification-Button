@@ -66,3 +66,11 @@ Create the following four fields:
    - **Label:** Pickup Extra Emails  
    - **Technical Name:** `x_studio_notify_pickup_ready`  
    - **Help Text:** “Comma/semicolon/space-separated emails to notify when orders are ready for pickup.”
+  
+---
+
+## Step 2
+This step was intended to create an email template, but this template will be implemented into the server action. The current "Ready for Pickup" email template sent when the HandOff transfer is validated will be changed to reflect that the order has been picked up.
+
+---
+
