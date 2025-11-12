@@ -137,3 +137,67 @@ Visibility / Domain:
 4E) Place the counter field near the button (optional)
 
 If you want the team to see the count next to the button, drag x_notify_count near the button area (header or top of the form), and leave it read-only.
+
+---
+
+Of course! Here is the text converted into a consistent Markdown format.
+
+***
+
+# Step 4 — Add the “Notify Ready for Pickup” Button on Handoff Transfers
+
+We’ll now add the button that triggers your server action directly from the Handoff transfer form.
+
+---
+
+## 4A — Open Studio on a Handoff Transfer
+
+1.  Go to **Inventory → Operations → Transfers**.
+2.  Open any **Handoff transfer**.
+3.  Click the **⋮ (gear)** icon → **Studio** to edit the form.
+
+---
+
+## 4B — Add the Button
+
+1.  In the left palette, choose **Buttons** → drag a **Header Button** (or a regular Form button if the header isn’t available) onto the form.
+2.  Configure the button as follows:
+    *   **Label:** `Notify Ready for Pickup`
+    *   **Type / Action:** `Execute Server Action`
+    *   **Server Action:** `Notify Ready for Pickup (Email)` (the one you created in Step 3)
+    *   **Confirm Before Execution:** ✅ Enable
+        *   **Confirmation Message:** `Send pickup notification now?`
+
+---
+
+## 4C — Set Button Visibility (Only on Handoff, Not Done/Cancel)
+
+In the button’s **Visibility / Domain** section (sometimes labeled *“Limit Visibility”* or *“Invisible If”*), set this domain:
+
+```python
+[('picking_type_id', '=', 2), ('state', 'not in', ['done','cancel'])]
+```
+
+This ensures the button only appears on Handoff transfers that are not yet completed or cancelled. It uses Operation Type ID = 2, so renaming “Handoff” will not affect it.
+
+---
+
+## 4D — Optional: Show Button Only After First Notification Sent
+
+If you prefer to display the button only after at least one notification has been sent, use this extended domain instead:
+
+```python
+[('picking_type_id', '=', 2), ('state', 'not in', ['done','cancel']), ('x_studio_notify_count', '>=', 1)]
+```
+
+---
+
+## 4E — Place the Counter Field Near the Button (Optional)
+
+To help users track how many notifications have been sent:
+
+*   Drag the field `x_studio_notify_count` near the button area (in the header or top of the form).
+*   Keep it **Read-only**.
+*   Optionally set the **Widget** to `Badge` for a clean numeric counter display.
+
+---
