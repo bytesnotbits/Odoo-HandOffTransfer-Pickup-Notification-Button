@@ -1,7 +1,7 @@
 Step 1 — Create tracking fields on Transfers (stock.picking)
 
 We’ll add four fields that power the button logic and audit trail.
-
+==================================================================
 1A) Open Studio on the Transfer form
 
 Go to Inventory → Operations → Transfers.
@@ -9,7 +9,7 @@ Go to Inventory → Operations → Transfers.
 Open any Handoff transfer (or any transfer—just for editing the view).
 
 Click ⋮ (gear) → Studio to open Studio on the transfer form.
-
+==================================================================
 1B) Add fields (all on model: Transfer (stock.picking))
 
 Create these four fields:
@@ -65,7 +65,15 @@ Properties: Read-only
 Placement: drag this field into the header (top bar of the form) to the right side so users see it like a counter next to the future button.
 
 Tip: If “Badge” isn’t available in your Studio widget list, leave it as an Integer for now—we’ll still increment it; we can change the widget later.
+==================================================================
+B1) Add the partner field (Studio → Contacts)
 
-1C) Save the view
+Open Contacts → any partner → Studio.
 
-Click Close (top-right of Studio) to save.
+Add a Text field:
+
+Label: Pickup extra emails
+
+Technical name: x_pickup_extra_emails
+
+Help text: “Comma/semicolon/space separated emails to notify when orders are ready for pickup.”
