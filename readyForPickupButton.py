@@ -1,6 +1,6 @@
 # --- Guardrails: only on Handoff, not done/cancel ---
-if not record.picking_type_id or record.picking_type_id.name != 'Handoff':
-    raise UserError("This notification is only available on the Handoff operation type.")
+if not record.picking_type_id or record.picking_type_id.id != 2:
+    raise UserError("This notification is only available on the Handoff operation type (ID 2).")
 if record.state in ('done', 'cancel'):
     raise UserError("This transfer is already validated or cancelled.")
 
