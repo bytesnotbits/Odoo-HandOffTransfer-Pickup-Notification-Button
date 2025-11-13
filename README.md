@@ -41,7 +41,8 @@ Create the following four fields:
 ### 🟩 Field 3 — Pickup Notified By
 - **Type:** Many2one → Users (`res.users`)  
 - **Technical Name:** `x_studio_pickup_notified_by`  
-- **Label:** Pickup Notified By  
+- **Label:** Pickup Notified By
+- **Model:** Transfer
 - **Properties:** Read-only  
 - **Placement:** Same **“Notifications”** section
 
