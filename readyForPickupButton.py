@@ -36,7 +36,7 @@ def extract_emails(raw):
             out.append(e)
     return out
 
-# --- Collect extra emails from Customer + Delivery Address (Studio field x_studio_notify_pickup_ready) ---
+# --- Collect extra emails from Customer + Delivery Address (x_studio_notify_pickup_ready on res.partner) ---
 extra_sources = []
 
 if so and so.partner_id and 'x_studio_notify_pickup_ready' in so.partner_id._fields:
@@ -52,7 +52,14 @@ for src in extra_sources:
     for e in extract_emails(src):
         emails.add(e)
 
-# If we somehow have no emails, stop with a friendly error
+# --- Always include Customer and Ship-to main emails if present ---
+if so and so.partner_id and so.partner_id.email:
+    emails.add(so.partner_id.email.strip().lower())
+
+if shipping and shipping.email:
+    emails.add(shipping.email.strip().lower())
+
+# If we somehow still have no emails, stop with a friendly error
 if not emails:
     raise UserError("No recipient emails found. Add followers with emails or fill the 'Notify Pickup Ready' field on the Customer/Delivery Address.")
 
@@ -87,35 +94,19 @@ mail_values = {
 mail = Mail.create(mail_values)
 mail.send()
 
-# --- Audit: increment counter and stamp who/when ---
-has_count = 'x_studio_notify_count' in record._fields
-current = 0
-if has_count:
-    current = record.x_studio_notify_count or 0
-new_count = current + 1
-
-vals = {}
-if 'x_studio_ready_notified' in record._fields:
-    vals['x_studio_ready_notified'] = True
-if 'x_studio_pickup_notified_on' in record._fields:
-    # Safe-eval provides 'datetime' (no need to import)
-    vals['x_studio_pickup_notified_on'] = datetime.datetime.utcnow()
-if 'x_studio_pickup_notified_by' in record._fields:
-    vals['x_studio_pickup_notified_by'] = env.user.id
-if has_count:
-    vals['x_studio_notify_count'] = new_count
-
-if vals:
-    record.write(vals)
-
-# --- Chatter note with recipients ---
-note = "Ready for Pickup notification sent"
-if has_count:
-    note += f" (#{new_count})"
-note += f" to: {', '.join(sorted(emails))}"
-
+# --- Chatter note with recipients (no audit fields yet) ---
 record.message_post(
-    body=note,
+    body="Ready for Pickup notification sent to: " + ', '.join(sorted(emails)),
     message_type='comment',
     subtype_xmlid='mail.mt_note',
 )
+
+# --- TEST 1: try writing ONLY th eboolean flag ---
+record.write({'x_studio_ready_notified': True})
+
+# --- THIS LINE IS CAUSING THE SERVER ERROR ---
+# --- TEST 2: try writing ONLY the Many2one (Pickup Notified By) ---
+# record.write({'x_studio_pickup_notified_by': env.user.id})
+
+record.write({'x_studio_pickup_notified_on': datetime.datetime.utcnow()})
+record.write({'x_studio_pickup_notified_on': datetime.datetime.utcnow()})
